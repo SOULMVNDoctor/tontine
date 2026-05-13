@@ -1,22 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Application web moderne de tontine (téléphone) avec **Next.js App Router**, **Tailwind CSS**, **Prisma** et **MongoDB (Atlas)**.
+
+Espaces inclus :
+- Admin : `/admin`
+- Connexion participants : `/login`
+- Participant 1 : `/p1` (protégé)
+- Participant 2 : `/p2` (protégé)
+
+Fonctionnalités clés :
+- Règles : 2000 FCFA / jour, du lundi au vendredi, sur 1 mois (période seedée)
+- Calculs automatiques : total payé, restant, jours restants, total général collecté
+- Admin : tableau ✅/❌, retards en rouge, bouton “Paiement reçu”
+- Temps réel : mise à jour via SSE (`/api/events`) + compte à rebours dynamique
 
 ## Getting Started
 
-First, run the development server:
+### 1) Installer les dépendances
+
+```bash
+npm install
+```
+
+### 2) Configurer la base (MongoDB Atlas)
+
+Dans `.env`, définissez `DATABASE_URL` avec votre chaîne de connexion MongoDB Atlas.
+
+```bash
+npm run prisma:push
+```
+
+Si vous avez besoin de repartir de zéro (dev) :
+
+```bash
+npm run prisma:reset
+```
+
+### 3) Ajouter des données mockées
+
+```bash
+npm run db:seed
+```
+
+### 4) Lancer en dev
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Connexion (participants)
+
+- Ouvrir `/login`
+- Identifiants seed par défaut :
+	- `admin` / `1518` (Admin)
+	- `ibrahim` / `7482` (Participant 1)
+	- `banel` / `5557` (Participant 2)
+
+### Scripts utiles
+
+```bash
+npm run prisma:studio
+npm run prisma:generate
+npm run prisma:push
+npm run prisma:reset
+npm run lint
+npm run build
+```
+
+Notes :
+- Les routes API sont dans `src/app/api/*`.
+- Prisma : `prisma/schema.prisma`, seed : `prisma/seed.js`.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

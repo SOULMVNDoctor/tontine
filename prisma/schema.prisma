@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Tontine {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  startDate   DateTime
+  endDate     DateTime
+  endsAt      DateTime
+  dailyAmount Int
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  participants Participant[]
+  payments    Payment[]
+}
+
+model Participant {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug      String   @unique
+  name      String
+  loginName String   @unique
+  passwordHash String
+  tontineId String   @db.ObjectId
+  tontine   Tontine  @relation(fields: [tontineId], references: [id])
+  payments  Payment[]
+  sessions  Session[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Admin {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  loginName    String         @unique
+  passwordHash String
+  sessions     AdminSession[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model AdminSession {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  token     String   @unique
+  adminId   String   @db.ObjectId
+  admin     Admin    @relation(fields: [adminId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+  @@index([expiresAt])
+}
+
+model Session {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  token         String      @unique
+  participantId String      @db.ObjectId
+  participant   Participant @relation(fields: [participantId], references: [id])
+  expiresAt     DateTime
+  createdAt     DateTime    @default(now())
+
+  @@index([participantId])
+  @@index([expiresAt])
+}
+
+model Payment {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  tontineId     String      @db.ObjectId
+  tontine       Tontine     @relation(fields: [tontineId], references: [id])
+  participantId String      @db.ObjectId
+  participant   Participant @relation(fields: [participantId], references: [id])
+  paidForDate   DateTime
+  amount        Int
+  note          String?
+  createdAt     DateTime    @default(now())
+
+  @@unique([participantId, paidForDate])
+  @@index([tontineId, paidForDate])
+}
